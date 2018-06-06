@@ -33,7 +33,7 @@ function App(viewport, data){
 	var depthMaps = [];
 	var filters = [];
 	
-	var activeSlide = 1;
+	var activeSlide = 0;
 	var dampening = 0.16;
 	var mobileDampening = 1;
 	
@@ -41,7 +41,6 @@ function App(viewport, data){
 	var utils = new Utils();
 		
 	var render = function() {
-
 			renderer.render(stage);
 		};
 		
