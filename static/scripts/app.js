@@ -89,6 +89,12 @@ function App(viewport, data){
 				ploader.add(keys[current].textureKey, data[current].texture);
 				ploader.add(keys[current].dmapKey, data[current].dmap);
 			}
+			ploader.on('progress', function (loader, res) {
+				// you can access the loader from the arguments
+				// it has a progress variable that represents your progress
+				// as a percentage
+				console.log(loader.progress);
+			})
 			ploader.once('complete', this.start);
 			ploader.load();
 		},
