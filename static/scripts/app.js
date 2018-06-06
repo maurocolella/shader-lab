@@ -29,10 +29,11 @@ function App(viewport, data){
 	var foreground = new PIXI.Container();
 	
 	var ploader = new PIXI.loaders.Loader();
-	var sprite = {};
-	var depth = {};
-	var filter = {};
+	var sprites = [];
+	var depthMaps = [];
+	var filters = [];
 	
+	var activeSlide = 1;
 	var dampening = 0.16;
 	var mobileDampening = 1;
 	
@@ -40,24 +41,32 @@ function App(viewport, data){
 	var utils = new Utils();
 		
 	var render = function() {
-			sprite.addChild(depth);
-			depth.renderable = false;
 
 			renderer.render(stage);
 		};
 		
+	var handleClick = function() {
+		activeSlide++;
+		activeSlide %= data.length;
+		var current = 0;
+		for(; current < data.length; current++){
+			sprites[current].renderable = current === activeSlide;
+		}
+		requestAnimationFrame(render);
+	}
+		
 	var handleMouseMove = function() {
-			if(filter && filter.scale){
-				filter.scale.x = ((window.innerWidth / 2) - (event.x ? event.x : event.clientX)) * dampening;
-				filter.scale.y = ((window.innerHeight / 2) - (event.y ? event.y : event.clientY)) * dampening;
+			if(filters[activeSlide] && filters[activeSlide].scale){
+				filters[activeSlide].scale.x = ((window.innerWidth / 2) - (event.x ? event.x : event.clientX)) * dampening;
+				filters[activeSlide].scale.y = ((window.innerHeight / 2) - (event.y ? event.y : event.clientY)) * dampening;
 				requestAnimationFrame(render);
 			}
 		};
 		
 	var handleDeviceOrientation = function(event) {
-			if(filter && filter.scale){
-				filter.scale.x = -event.beta * mobileDampening;
-				filter.scale.y = -event.gamma * mobileDampening;
+			if(filters[activeSlide] && filters[activeSlide].scale){
+				filters[activeSlide].scale.x = -event.beta * mobileDampening;
+				filters[activeSlide].scale.y = -event.gamma * mobileDampening;
 				requestAnimationFrame(render);
 			}
 		}
@@ -69,6 +78,7 @@ function App(viewport, data){
 		init: function() {
 			window.addEventListener('deviceorientation', handleDeviceOrientation, true);
 			document.addEventListener('mousemove', handleMouseMove, true);
+			document.addEventListener('click', handleClick, true);
 			
 			var current = 0;
 			
@@ -84,37 +94,49 @@ function App(viewport, data){
 			ploader.load();
 		},
 		start: function() {
-			var index = keys[0];
-			var fgImage = ploader.resources[index.textureKey].texture.baseTexture;
-			var depthImage = ploader.resources[index.dmapKey].texture.baseTexture;
-			var viewportWidth = viewport.width;
-			var viewportHeight = viewport.height;
-
-			sprite = new PIXI.Sprite(ploader.resources[index.textureKey].texture);
+			var current = 0,
+				index,
+				fgImage,
+				depthImage,
+				viewportWidth,
+				viewportHeight;
 			
-			sprite.blendMode = PIXI.BLEND_MODES.SCREEN;
+			for(; current < data.length; current++){
+				index = keys[current];
+				fgImage = ploader.resources[index.textureKey].texture.baseTexture;
+				depthImage = ploader.resources[index.dmapKey].texture.baseTexture;
+				viewportWidth = viewport.width;
+				viewportHeight = viewport.height;
 
-			sprite.scale.x = viewportWidth / fgImage.realWidth;
-			sprite.scale.y = viewportHeight / fgImage.realHeight;
+				sprites[current] = new PIXI.Sprite(ploader.resources[index.textureKey].texture);
+				sprites[current].blendMode = PIXI.BLEND_MODES.SCREEN;
 
-			foreground.addChild(sprite);
+				sprites[current].scale.x = viewportWidth / fgImage.realWidth;
+				sprites[current].scale.y = viewportHeight / fgImage.realHeight;
 
-			depth = new PIXI.Sprite(ploader.resources[index.dmapKey].texture);
+				foreground.addChild(sprites[current]);
 
-			depth.scale.x = viewportWidth / depthImage.realWidth;
-			depth.scale.y = viewportHeight / depthImage.realHeight;
+				depthMaps[current] = new PIXI.Sprite(ploader.resources[index.dmapKey].texture);
 
-			filter = new PIXI.filters.DisplacementFilter(depth, 0);
-			sprite.filters = [filter];
+				depthMaps[current].scale.x = viewportWidth / depthImage.realWidth;
+				depthMaps[current].scale.y = viewportHeight / depthImage.realHeight;
+
+				filters[current] = new PIXI.filters.DisplacementFilter(depthMaps[current], 0);
+				sprites[current].filters = [filters[current]];
+				
+				sprites[current].addChild(depthMaps[current]);
+				depthMaps[current].renderable = false;
+			}
 			
 			render();
 		},
 		destroy: function() {
 			window.removeEventListener('deviceorientation', handleDeviceOrientation, true);
-			document.removeEventListener('mousemove', handleMouseMove);
-			filter.destroy();
-			depth.destroy();
-			sprite.destroy();
+			document.removeEventListener('mousemove', handleMouseMove, true);
+			document.removeEventListener('click', handleClick, true);
+			// filter.destroy();
+			// depth.destroy();
+			// sprite.destroy();
 			ploader.destroy();
 			foreground.destroy();
 			stage.destroy();
