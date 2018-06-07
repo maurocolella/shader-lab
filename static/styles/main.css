@@ -15,11 +15,12 @@ body {
 
 #viewport {
 	margin: 0;
-	left: -2%;
+	left: 50%;
 	position: absolute;
-	height: 104%;
-	top: -2%;
-	min-width: 104%;
+	height: 110%;
+	top: 50%;
+	min-width: 110%;
+	transform: translate(-50%,-50%);
 }
 
 .debug {

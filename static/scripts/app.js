@@ -21,6 +21,7 @@ function App(viewport, data){
 		1050,
 		{
 		  view: viewport,
+		  // resolution: window.devicePixelRatio
 		},
 	);
 	
@@ -39,10 +40,20 @@ function App(viewport, data){
 	
 	var keys = [];
 	var utils = new Utils();
+	
+	stage.addChild(container);
+	stage.addChild(foreground);
 		
 	var render = function() {
-			renderer.render(stage);
-		};
+		renderer.render(stage);
+		requestAnimationFrame(render);
+	};
+		
+	var handleResize = function() {
+		var ratio = Math.max(window.innerWidth / 1680, window.innerHeight / 1050);
+		stage.scale.set(ratio, ratio);
+		renderer.resize(window.innerWidth, window.innerHeight);
+	};
 		
 	var handleClick = function() {
 		activeSlide++;
@@ -51,30 +62,25 @@ function App(viewport, data){
 		for(; current < data.length; current++){
 			sprites[current].renderable = current === activeSlide;
 		}
-		requestAnimationFrame(render);
 	}
 		
 	var handleMouseMove = function() {
-			if(filters[activeSlide] && filters[activeSlide].scale){
-				filters[activeSlide].scale.x = ((window.innerWidth / 2) - (event.x ? event.x : event.clientX)) * dampening;
-				filters[activeSlide].scale.y = ((window.innerHeight / 2) - (event.y ? event.y : event.clientY)) * dampening;
-				requestAnimationFrame(render);
-			}
-		};
+		if(filters[activeSlide] && filters[activeSlide].scale){
+			filters[activeSlide].scale.x = ((window.innerWidth / 2) - (event.x ? event.x : event.clientX)) * dampening;
+			filters[activeSlide].scale.y = ((window.innerHeight / 2) - (event.y ? event.y : event.clientY)) * dampening;
+		}
+	};
 		
 	var handleDeviceOrientation = function(event) {
-			if(filters[activeSlide] && filters[activeSlide].scale){
-				filters[activeSlide].scale.x = -event.beta * mobileDampening;
-				filters[activeSlide].scale.y = -event.gamma * mobileDampening;
-				requestAnimationFrame(render);
-			}
+		if(filters[activeSlide] && filters[activeSlide].scale){
+			filters[activeSlide].scale.x = -event.beta * mobileDampening;
+			filters[activeSlide].scale.y = -event.gamma * mobileDampening;
 		}
-	
-	stage.addChild(container);
-	stage.addChild(foreground);
+	};
 
 	var instance = {
 		init: function() {
+			window.addEventListener('resize', handleResize, true);
 			window.addEventListener('deviceorientation', handleDeviceOrientation, true);
 			document.addEventListener('mousemove', handleMouseMove, true);
 			document.addEventListener('click', handleClick, true);
@@ -133,9 +139,11 @@ function App(viewport, data){
 				depthMaps[current].renderable = false;
 			}
 			
-			render();
+			handleResize();
+			requestAnimationFrame(render);
 		},
 		destroy: function() {
+			window.removeEventListener('resize', handleResize, true);
 			window.removeEventListener('deviceorientation', handleDeviceOrientation, true);
 			document.removeEventListener('mousemove', handleMouseMove, true);
 			document.removeEventListener('click', handleClick, true);
