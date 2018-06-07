@@ -41,9 +41,9 @@ void main()
         float gray = (color.x + color.y + color.z) / 3.0;
         vec3 grayscale = vec3(gray);
 
-        color = Overlay(SEPIA_RGB, grayscale);
+        color = Overlay(color, grayscale);
 
-        color = grayscale + sepia * (color - grayscale);
+        color = color + sepia * (color - grayscale);
     }
 
     vec2 coord = vTextureCoord * filterArea.xy / dimensions.xy;
