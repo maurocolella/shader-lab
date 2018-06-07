@@ -1,0 +1,32 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	align-items: center;
+	background-color: #232322;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	overflow: hidden;
+}
+
+#viewport {
+	margin: 0;
+	left: 50%;
+	position: absolute;
+	height: 110%;
+	top: 50%;
+	min-width: 110%;
+	transform: translate(-50%,-50%);
+}
+
+.debug {
+	color: red;
+	left: 0;
+	position: fixed;
+	padding: 10px;
+	top: 0;
+}
