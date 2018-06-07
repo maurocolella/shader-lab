@@ -1,28 +1,18 @@
 <html>
-	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>
-		Displacement map by Mauro Colella
-		</title>
-		<link rel="stylesheet" href="static/styles/main.css">
-	</head>
-	<body>
-	<main>
-		<aside class="debug"></aside>
-		<canvas id="viewport">
-		</canvas>
-	</main>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
-	<script src="static/scripts/app.js"></script>
-	<script>
-		var app = new App(document.getElementById('viewport'), 
-			[
-				{texture: 'static/images/on-the-clouds.jpg', dmap:  'static/images/cloud-dm.jpg'},
-				{texture: 'static/images/surf.jpg', dmap:  'static/images/surf-dm.jpg'},
-				// {texture: 'static/images/lips.jpg', dmap:  'static/images/lips-dm.jpg'}
-			]
-		);
-		app.init();
-	</script>
-	</body>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Displacement map by Mauro Colella
+    </title>
+    <link rel="stylesheet" href="static/styles/main.css">
+  </head>
+  <body>
+    <main>
+      <aside class="debug"></aside>
+      <canvas id="viewport">
+      </canvas>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
+    <script src="static/dist/app.bundle.js"></script>
+  </body>
 </html>
