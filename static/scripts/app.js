@@ -50,9 +50,14 @@ function App(viewport, data){
 	};
 		
 	var handleResize = function() {
-		var ratio = Math.max(window.innerWidth / 1680, window.innerHeight / 1050);
+		var windowWidth = window.innerWidth;
+		var windowHeight = window.innerHeight;
+		
+		var ratio = Math.max(windowWidth / 1680, windowHeight / 1050);
 		stage.scale.set(ratio, ratio);
-		renderer.resize(window.innerWidth, window.innerHeight);
+		stage.position.x = (windowWidth - 1680 * ratio) >> 1;
+		stage.position.y = (windowHeight - 1050 * ratio) >> 1;
+		renderer.resize(windowWidth, windowHeight);
 	};
 		
 	var handleClick = function() {
